@@ -1297,7 +1297,7 @@ partial interface StorageManager {
 
 <div class="note domintro">
   : |directoryHandle| = await navigator . storage . {{StorageManager/getDirectory()}}
-  :: Returns the root directory of the origin private file system.
+  :: Returns the <dfn for="directory entry">root directory of the origin private file system</dfn>.
 </div>
 
 <div algorithm>
