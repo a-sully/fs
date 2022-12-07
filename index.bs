@@ -250,15 +250,12 @@ The <dfn attribute for=FileSystemHandle>name</dfn> getter steps are to return [=
   : await |handle| . {{FileSystemHandle/remove()|remove}}({ {{FileSystemRemoveOptions/recursive}}: false })
   :: Attempts to remove the entry represented by |handle| from the underlying file system.
 
-     Attempting to delete a file or directory that does not exist is considered success,
-     while attempting to delete a non-empty directory will result in a promise rejection.
+     Attempting to delete a non-empty directory will result in a promise rejection.
 
   : await |handle| . {{FileSystemHandle/remove()|remove}}({ {{FileSystemRemoveOptions/recursive}}: true })
   :: Attempts to remove the entry represented by |handle| from the underlying file system.
 
      If the entry is a directory, its contents will also be deleted recursively.
-
-     Attempting to delete a file or directory that does not exist is considered success.
 
      For files or directories with multiple hardlinks or symlinks, the entry which is deleted
      is the entry corresponding to the path which was used to obtain the handle.
@@ -280,8 +277,12 @@ The <dfn method for=FileSystemHandle>remove(|options|)</dfn> method steps are:
   1. If |lockResult| is false, [=reject=] |result| with a
      "{{NoModificationAllowedError}}" {{DOMException}} and abort.
 
+  1. If |entry| does not exist in the underlying file system,
+     [=/reject=] |result| with a {{NotFoundError}} and abort.
+
   1. If |entry| is a [=directory entry=]:
-    1. If |entry| is not an empty directory and |options|.{{FileSystemRemoveOptions/recursive}} is `false`:
+    1. If |entry|'s [=directory entry/children=] is an empty set and
+       |options|.{{FileSystemRemoveOptions/recursive}} is `false`:
       1. [=/Reject=] |result| with an "{{InvalidModificationError}}" {{DOMException}} and abort.
    1. If |entry| is the [=root directory of the origin private file system=]:
       1. [=/Reject=] |result| with a "{{NoModificationAllowedError}}" {{DOMException}} and abort.
