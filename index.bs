@@ -283,7 +283,7 @@ The <dfn method for=FileSystemHandle>remove(|options|)</dfn> method steps are:
 
   1. If |entry| is a [=directory entry=]:
     1. If |entry|'s [=directory entry/children=] [=set/is empty=] and
-       |options|.{{FileSystemRemoveOptions/recursive}} is `false`:
+       |options|'s {{FileSystemRemoveOptions/recursive}} is `false`:
       1. [=/Reject=] |result| with an "{{InvalidModificationError}}" {{DOMException}} and abort.
     1. If |entry| is the [=root directory of the origin private file system=]:
       1. [=set/For each=] |child| of |entry|'s [=directory entry/children=]:
