@@ -14,8 +14,6 @@ spec:webidl; type:dfn; text:resolve
 </pre>
 
 <pre class=anchors>
-urlPrefix: https://html.spec.whatwg.org/; spec: html
-  type: dfn; text: serializable objects; url: serializable-objects
 urlPrefix: https://tc39.es/ecma262/; spec: ECMA-262
   type: dfn; text: realm; url: realm
 urlPrefix: https://storage.spec.whatwg.org/; spec: storage
@@ -268,7 +266,7 @@ The <dfn attribute for=FileSystemHandle>name</dfn> getter steps are to return [=
 The <dfn method for=FileSystemHandle>remove(|options|)</dfn> method steps are:
 
 1. Let |result| be [=a new promise=].
-1. [=Queue a task=] on the [=storage task source=] to run these steps:
+1. Run these steps [=in parallel=]:
   1. Let |access| be the result of running [=this=]'s
      [=FileSystemHandle/entry=]'s [=file system entry/request access=] given
      "`readwrite`".
@@ -281,32 +279,33 @@ The <dfn method for=FileSystemHandle>remove(|options|)</dfn> method steps are:
   1. If |lockResult| is false, [=reject=] |result| with a
      "{{NoModificationAllowedError}}" {{DOMException}} and abort.
 
-  1. If |entry| does not exist in the underlying file system,
-     [=/reject=] |result| with a {{NotFoundError}} and abort.
+  1. [=Queue a task=] on the [=storage task source=] to run these steps:
+    1. If |entry| does not exist in the underlying file system, [=/reject=]
+       |result| with a "{{NotFoundError}}" {{DOMException}} and abort.
 
-  1. If |entry| is a [=directory entry=]:
-    1. If |entry|'s [=directory entry/children=] [=set/is empty=] and
-       |options|'s {{FileSystemRemoveOptions/recursive}} is `false`:
-      1. [=/Reject=] |result| with an "{{InvalidModificationError}}"
-         {{DOMException}} and abort.
-    1. If |entry| is the [=root directory of the origin private file system=]:
-      1. [=set/For each=] |child| of |entry|'s [=directory entry/children=]:
-        1. Attempt to remove |child| from the underlying file system.
-          1. If removing |child| in the underlying file system throws an
-             exception, [=/reject=] |result| with that exception and abort.
-      1. Set |entry|'s [=directory entry/children=] to an empty [=/set=].
-      1. [=/Resolve=] |result| with `undefined`.
+    1. If |entry| is a [=directory entry=]:
+      1. If |entry|'s [=directory entry/children=] [=set/is empty=] and
+         |options|'s {{FileSystemRemoveOptions/recursive}} is `false`:
+        1. [=/Reject=] |result| with an "{{InvalidModificationError}}"
+           {{DOMException}} and abort.
+      1. If |entry| is the [=root directory of an origin private file system=]:
+        1. [=set/For each=] |child| of |entry|'s [=directory entry/children=]:
+          1. Attempt to remove |child| from the underlying file system.
+            1. If removing |child| in the underlying file system throws an
+               exception, [=/reject=] |result| with that exception and abort.
+        1. Set |entry|'s [=directory entry/children=] to an empty [=/set=].
+        1. [=/Resolve=] |result| with `undefined`.
 
-  1. Attempt to remove |entry| from the underlying file system.
-    1. If removing |entry| in the underlying file system throws an exception,
-       [=/reject=] |result| with that exception and abort.
+    1. Attempt to remove |entry| from the underlying file system.
+      1. If removing |entry| in the underlying file system throws an exception,
+         [=/reject=] |result| with that exception and abort.
 
-       Note: If {{FileSystemRemoveOptions/recursive}} is `true`, the removal
-       can fail non-atomically. Some files or directories might have been
-       removed while other files or directories still exist.
+         Note: If {{FileSystemRemoveOptions/recursive}} is `true`, the removal
+         can fail non-atomically. Some files or directories might have been
+         removed while other files or directories still exist.
 
-       Issue(68): Better specify what possible exceptions this could throw.
-  1. [=/Resolve=] |result| with `undefined`.
+         Issue(68): Better specify what possible exceptions this could throw.
+    1. [=/Resolve=] |result| with `undefined`.
 
 1. Return |result|.
 
@@ -1354,7 +1353,7 @@ partial interface StorageManager {
 
 <div class="note domintro">
   : |directoryHandle| = await navigator . storage . {{StorageManager/getDirectory()}}
-  :: Returns the <dfn for="directory entry">root directory of the origin private file system</dfn>.
+  :: Returns the <dfn for="directory entry">root directory of an origin private file system</dfn>.
 </div>
 
 <div algorithm>
